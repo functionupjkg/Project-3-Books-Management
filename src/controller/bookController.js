@@ -84,7 +84,7 @@ const getBook = async (req, res) => {
 
         data.isDeleted = false
 
-        let getFiltersBook = await bookModel.find(data).sort({ title: 1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, review: 1, releasedAt: 1 })
+        let getFiltersBook = await bookModel.find(data).sort({ title:1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, review: 1, releasedAt: 1 })
 
         if (getFiltersBook.length == 0)
             return res.status(404).send({ status: false, message: "No Such Book Found" })
@@ -192,11 +192,16 @@ const deleteBook = async function (req, res) {
             return res.status(404).send({ status: false, message: "Book not found... You have already deleted", });
 
         let updated = await bookModel.findByIdAndUpdate(savedData, { $set: { isDeleted: true, deletedAt: new Date() } });
+       
         res.status(200).send({ status: true, message: "Book is  deleted sucessfully" });
     } catch (error) {
         res.status(500).send({ status: false, message: error.message });
     }
 }
+
+
+
+
 
 
 // <<====================================== Exported Modules =========================>>//

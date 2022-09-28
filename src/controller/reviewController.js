@@ -84,18 +84,18 @@ const updateReview = async function (req, res) {
 
         let checkUniqValue = await reviewModel.findById(reviewId)  
         
-        if (reviewedBy || reviewedBy === "") {
+        if (reviewedBy ) {
             if (!isValidAdd(reviewedBy)) return res.status(400).send({ status: false, message: "Please Enter Reviewer's Name!" })
             if (!isValid(reviewedBy)) return res.status(400).send({ status: false, message: "Please Enter Reviewer's Name Correctly!" })  
             if (checkUniqValue.reviewedBy === reviewedBy) return res.status(400).send({ status: false, message: "Reviewer's Name already exists" })
         }
        
-        if (rating || rating === "") {
+        if (rating ) {
             if (!isValidRating(rating)) return res.status(400).send({ status: false, message: "Please Enter Book Rating between 1-5 (not decimal)." })
             if (checkUniqValue.rating == rating) return res.status(400).send({ status: false, message: "Rating already exists" })
         }
 
-        if (review || review === "") {
+        if (review ) {
             if (!isValidAdd(review)) return res.status(400).send({ status: false, message: "Please Enter Review!" })
             if (!isValid(review)) return res.status(400).send({ status: false, message: "Please Enter Review in Correct Format!" })
             if (checkUniqValue.review === review) return res.status(400).send({ status: false, message: "Review already exists" })
@@ -145,7 +145,9 @@ const deleteReview = async function (req, res) {
         if (checkReviewId.isDeleted == true)
             return res.status(404).send({ status: false, message: "Review not found and already deleted" })
 
-        await reviewModel.updateOne({ _id: getId.reviewId }, { isDeleted: true }, { $inc: { review: -1 } })
+        await reviewModel.updateOne({ _id: getId.reviewId }, { isDeleted: true })
+
+        await bookModel.updateOne({_id: getId.bookId},{$inc: {reviews: -1}})
 
         return res.status(200).send({ status: true, message: "Deleted Succesfully" })
     } catch (err) {
@@ -159,4 +161,4 @@ const deleteReview = async function (req, res) {
 
 // <<====================================== Exported Modules =========================>>//
 
-module.exports = { createReview,  updateReview ,deleteReview};
+module.exports = { createReview,  updateReview , deleteReview};

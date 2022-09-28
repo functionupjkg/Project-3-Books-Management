@@ -68,6 +68,12 @@ const isValidRating = function (rating) {
     return (/^[12345]$/).test(rating)
 };
 
+//<<----------------Validation for LogoLink ---------------->>
+const validURL = function (Url){
+    return (/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%.\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%\+.~#?&\/=]*)$/.test(Url))
+};
+
+
 
 const isValidAdd = function (value) {
     if (typeof value == "undefined" || value == null || typeof value === "boolean" || typeof value === "number") return false
@@ -88,8 +94,6 @@ const isValidtitle = function (value) {
 }
 
 
-
-
 //<<============================Exported Validation Function Modules ===========================>>//
 
 module.exports = {
@@ -106,7 +110,8 @@ module.exports = {
     isValidRating,
     isValidPin,
     isValidFid,
-    isValidtitle
+    isValidtitle,
+    validURL
 }
 
 

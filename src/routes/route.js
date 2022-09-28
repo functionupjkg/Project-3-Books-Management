@@ -4,6 +4,8 @@ const userController = require("../controller/userController");
 const bookController = require('../controller/bookController');
 const reviewController = require('../controller/reviewController')
 const midAuth = require('../middleware/auth')
+const aws = require('../Aws/aws')
+
 
 
 
@@ -40,6 +42,9 @@ router.put('/books/:bookId/review/:reviewId', reviewController.updateReview)
 
 //--- Delete Review Api---
 router.delete('/books/:bookId/review/:reviewId',  reviewController.deleteReview)
+
+// --Create Book-Cover Link by using AWS -S3 ----
+router.post("/write-file-aws", aws.bookCover)
 
 
 

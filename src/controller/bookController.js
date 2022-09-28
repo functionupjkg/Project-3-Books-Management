@@ -1,11 +1,12 @@
 const bookModel = require('../model/bookModel');
 const reviewModel = require('../model/reviewModel')
-const userModel = require('../model/userModel')
+const axios = require('axios')
+var request = require("request");
 
 
 
 //<<========================================== Exported Validation Function ===============================>>//
-const { isValidBody, isValid, isValidISBN, isValidDate, isValidObjectId, isValidAdd, isValidtitle } = require('../validator/validation')
+const { isValidBody, isValid, isValidISBN, isValidDate, isValidObjectId, isValidAdd, isValidtitle, validURL } = require('../validator/validation')
 
 
 
@@ -14,7 +15,7 @@ const { isValidBody, isValid, isValidISBN, isValidDate, isValidObjectId, isValid
 const createBook = async (req, res) => {
     try {
         let data = req.body;
-        let { title, excerpt, userId, ISBN, category, subcategory, releasedAt } = data
+        let { title, excerpt, userId, ISBN, category, subcategory, releasedAt, bookCover } = data
 
         if (isValidBody(data)) return res.status(400).send({ status: false, message: "Please Provide Data to Create Book" })
 
@@ -50,12 +51,31 @@ const createBook = async (req, res) => {
         if (!releasedAt) return res.status(400).send({ status: false, message: "ReleaseAt is manadatory" })
         if (!isValidDate(releasedAt)) return res.status(400).send({ status: false, message: "Please Enter Date in Valid format Ex- [YYYY-MM-DD]" })
 
+
+        if (!bookCover) return res.status(400).send({ status: false, message: "bookCover is manadatory" })
+        if (!validURL(bookCover)) return res.status(400).send({ status: false, message: "bookCover Link is Not Valid" })
+        //     // if(!result) return res.status(400).send({ status: false, message: "bookCover Link is Not Valid"})
+
+
+
+        // let options = {
+        //     method: 'HEAD',
+        //     url: `${bookCover}`
+        // };
+        // console.log(options)
+        // request(options, function (error, response, body) {
+        //     if (error) throw new Error(error);
+
+        //     console.log(response.statusCode);
+        // });
+
+
         let saveBookData = await bookModel.create(data)
         res.status(201).send({ status: true, message: "Book Created Successfully", data: saveBookData })
 
     }
     catch (err) {
-        res.status(500).send({ status: false, message: err.message })
+        res.status(500).send({ status: false, message: err })
     }
 }
 
@@ -84,8 +104,8 @@ const getBook = async (req, res) => {
 
         data.isDeleted = false
 
-        let getFiltersBook = await bookModel.find(data).sort({ title:1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, review: 1, releasedAt: 1 })
-
+        let getFiltersBook = await bookModel.find(data).sort({ title: 1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, review: 1, releasedAt: 1 })
+        // const sortedBooks = books.sort((x,y)=> x.title - y.title);
         if (getFiltersBook.length == 0)
             return res.status(404).send({ status: false, message: "No Such Book Found" })
         res.status(200).send({ status: true, count: getFiltersBook.length, message: "Books list", data: getFiltersBook })
@@ -154,7 +174,7 @@ const updateBook = async function (req, res) {
             if (checkUniqueValue.ISBN == data.ISBN) return res.status(400).send({ statusbar: false, message: "ISBN already exists" })
         }
         if (data.releasedAt) {
-            if (!isValidDate(data.releasedAt))  return res.status(400).send({ status: false, message: "Enter valid releaseAt date" })
+            if (!isValidDate(data.releasedAt)) return res.status(400).send({ status: false, message: "Enter valid releaseAt date" })
             if (checkUniqueValue.releasedAt == data.releasedAt) return res.status(400).send({ statusbar: false, message: "ISBN already exists" })
         }
         if (data.excerpt) {
@@ -192,7 +212,7 @@ const deleteBook = async function (req, res) {
             return res.status(404).send({ status: false, message: "Book not found... You have already deleted", });
 
         let updated = await bookModel.findByIdAndUpdate(savedData, { $set: { isDeleted: true, deletedAt: new Date() } });
-       
+
         res.status(200).send({ status: true, message: "Book is  deleted sucessfully" });
     } catch (error) {
         res.status(500).send({ status: false, message: error.message });

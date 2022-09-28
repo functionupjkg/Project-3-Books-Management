@@ -93,7 +93,7 @@ const isValidtitle = function (value) {
     return true
 }
 
-
+    
 //<<============================Exported Validation Function Modules ===========================>>//
 
 module.exports = {
